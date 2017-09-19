@@ -4,16 +4,24 @@ import (
 	"github.com/go-redis/redis"
 )
 
-func Write(client *redis.Client, fix string, serial int) {
+func WriteSingle(client *redis.Client, fix string, serial int) {
 	err := client.Set("keyWith"+fix+string(serial), serial, 0).Err()
 	if err != nil {
 		panic(err)
 	}
 }
 
-func Read(client *redis.Client, fix string, serial int) {
-	_, err := client.Get("keyWithSock" + string(serial)).Result()
+func ReadSingle(client *redis.Client, fix string, serial int) {
+	_, err := client.Get("keyWith" + fix + string(serial)).Result()
 	if err != nil {
 		panic(err)
 	}
+}
+
+func WritePipe(pipe redis.Pipeliner, fix string, serial int) {
+	pipe.Set("keyWith"+fix+string(serial), serial, 0)
+}
+
+func ReadPipe(pipe redis.Pipeliner, fix string, serial int) {
+	pipe.Get("keyWith" + fix + string(serial))
 }
